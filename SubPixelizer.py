@@ -2,6 +2,7 @@ import os, sys
 import imageio.v2 as imageio
 import numpy as np
 
+
 # Constants
 CMD_USAGE = "Usage: SubPixelizer.py -i <input_file> -o <output_file> [-2px]"
 
@@ -24,10 +25,10 @@ def retrieve_args():
                 CMD_USAGE,
                 "",
                 "Options:",
-                "  -i, --input            Input file (required)",
-                "  -o, --output           Output file (required)",
-                "  -2px                    Convert to normal pixel format (optional, default is subpixel)",
-                "  --help                  Display this help message"
+                "  -i,   --input           Input file (required)",
+                "  -o,   --output          Output file (required)",
+                "  -2px, --to-pixel        Convert to normal pixel format (optional, default converts to subpixel)",
+                "  -h,   --help            Display this help message"
             ]
             print("\n".join(help_msg)) # TODO: implment
 
@@ -79,7 +80,7 @@ def retrieve_args():
             print(CMD_USAGE)
             sys.exit(1)
     else:
-        print("Error: Invalid usage!")
+        print("Error: Invalid usage! (Use the '--help' argument if you are stuck)")
         print(CMD_USAGE)
         sys.exit(1)
 
