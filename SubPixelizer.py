@@ -17,6 +17,7 @@ def retrieve_args():
     input_file = ""
     output_file = ""
     is_subpixel_conversion = True
+    is_grayscale = True # Don't show subpixel color
 
     # Print help message
     if (len(sys.argv) == 2):
@@ -28,25 +29,20 @@ def retrieve_args():
                 "  -i,   --input              Input file (required)",
                 "  -o,   --output             Output file (required)",
                 "  -2px, --to-pixel           Convert to normal pixel format (optional, default converts to subpixel)",
-                "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale)",
+                "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale, only applies to subpixel conversion)",
                 "  -h,   --help               Display this help message"
             ]
-            print("\n".join(help_msg)) # TODO: Implement
+            print("\n".join(help_msg))
 
             sys.exit(0)
 
-    if (len(sys.argv) >= 5 and len(sys.argv) <= 6):
+    if (len(sys.argv) >= 5 and len(sys.argv) <= 7):
         # Get arguments
         i = 1
         while (i < len(sys.argv)):
             arg = sys.argv[i]
             i += 1 # Increment count
             known_arg = False
-
-            # Conversion operation
-            if (arg.lower() in ["--to-pixel", "-2px"]):
-                known_arg = True
-                is_subpixel_conversion = False
 
             # Input file
             if (arg.lower() in ["--input", "-i"]):
@@ -67,8 +63,18 @@ def retrieve_args():
                 output_file = sys.argv[i] # Get next arg
                 i += 1 # Increment count
 
+            # Conversion operation
+            if (arg.lower() in ["--to-pixel", "-2px"]):
+                known_arg = True
+                is_subpixel_conversion = False
+
+            # Grayscale output
+            if (arg.lower() == "--show-colors"):
+                known_arg = True
+                is_grayscale = False
+
             if (not known_arg):
-                print(f"Error: File not found! (\"{input_file}\")")
+                print(f"Error: Unknown argument, '{arg}'!")
                 sys.exit(1)
         
         # Check for missing arguments
@@ -85,10 +91,10 @@ def retrieve_args():
         print("\nError: Invalid usage! (Use the '--help' argument if you are stuck)")
         sys.exit(1)
 
-    return input_file, output_file, is_subpixel_conversion
+    return input_file, output_file, is_subpixel_conversion, is_grayscale
 
 # TODO: Comment
-def convert_to_subpixel(input_file: str, output_file: str):
+def convert_to_subpixel(input_file: str, output_file: str, is_grayscale: bool):
     # Read in input image
     in_img = imageio.imread(input_file)
 
@@ -106,7 +112,10 @@ def convert_to_subpixel(input_file: str, output_file: str):
                 subpixel = ((x * 3) + c)
                 intensity = in_img[y, x][c] # [row, column][rgb color]
                 
-                out_img[y, subpixel][c] = intensity
+                if is_grayscale:
+                    out_img[y, subpixel] = intensity
+                else:
+                    out_img[y, subpixel][c] = intensity # Show subpixel color
     
     # Write output to file
     try:
@@ -120,18 +129,18 @@ def convert_to_subpixel(input_file: str, output_file: str):
 
     print(f"Decoded subpixel image!\n  \"{input_file}\" -> \"{output_file}\"") 
 
-
 # TODO: Comment
+# TODO: Implement
 def convert_to_pixel(input_file: str, output_file: str):
     pass
 
 # TODO: Comment
 def main():
-    input_file, output_file, is_subpixel_conversion   = retrieve_args()
+    input_file, output_file, is_subpixel_conversion, is_grayscale  = retrieve_args()
 
     # Transfrom (sub)pixels
     if is_subpixel_conversion:
-        convert_to_subpixel(input_file, output_file)
+        convert_to_subpixel(input_file, output_file, is_grayscale)
     else:
         convert_to_pixel(input_file, output_file)
 
