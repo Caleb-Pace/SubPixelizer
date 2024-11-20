@@ -28,8 +28,8 @@ def retrieve_args():
                 "Options:",
                 "  -i,   --input              Input file (required)",
                 "  -o,   --output             Output file (required)",
-                "  -2px, --to-pixel           Convert to normal pixel format (optional, default decodes subpixel)",
-                "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale, only applies to subpixel conversion)",
+                "  -2px, --to-pixel           Treats input as subpixel data, converting 3 pixels into 1 (optional; defaults to decoding subpixels back into pixels)",
+                "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale, only applies to decode)",
                 "  -h,   --help               Display this help message"
             ]
             print("\n".join(help_msg))
@@ -102,7 +102,7 @@ def get_luminosity_value(pixel: list[int]) -> int:
     g = pixel[1]
     b = pixel[2]
 
-    return ((0.299 * r) + (0.587 * g) + (0.114 * b))
+    return ((0.2126 * r) + (0.7152 * g) + (0.0722 * b))
 
 # TODO: Comment
 def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
