@@ -1,5 +1,6 @@
 import os, sys
-
+import imageio.v2 as imageio
+import numpy as np
 
 # Constants
 CMD_USAGE = "Usage: SubPixelizer.py -i <input_file> -o <output_file> [-2px]"
@@ -15,8 +16,6 @@ def retrieve_args():
     input_file = ""
     output_file = ""
     is_subpixel_conversion = True
-
-    print("Arguments passed:", sys.argv) # DEBUG
 
     # Print help message
     if (len(sys.argv) == 2):
@@ -39,7 +38,6 @@ def retrieve_args():
         i = 1
         while (i < len(sys.argv)):
             arg = sys.argv[i]
-            print(f"Argument {i}: {arg}") # DEBUG
             i += 1 # Increment count
             known_arg = False
 
@@ -88,12 +86,52 @@ def retrieve_args():
     return input_file, output_file, is_subpixel_conversion
 
 # TODO: Comment
+def convert_to_subpixel(input_file: str, output_file: str):
+    # Read in input image
+    in_img = imageio.imread(input_file)
+
+    # Get image size
+    height, width = in_img.shape[:2]
+    out_width = (width * 3)
+
+    # Create image
+    out_img = np.zeros((height, out_width, 3), dtype=np.uint8)
+
+    # Generate output
+    for y in range(height):
+        for x in range(width):
+            for c in range(3):
+                subpixel = ((x * 3) + c)
+                intensity = in_img[y, x][c] # [row, column][rgb color]
+                
+                out_img[y, subpixel] = intensity
+    
+    # Write output to file
+    try:
+        imageio.imwrite(output_file, out_img)
+    except ValueError:
+        # Get file extension
+        extension = output_file.split(".")[-1]
+
+        print(f"Error: Unsupported image type! (\"{extension}\")")
+        sys.exit(1)
+
+    print(f"Decoded subpixel image!\n  \"{input_file}\" -> \"{output_file}\"") 
+
+
+# TODO: Comment
+def convert_to_pixel(input_file: str, output_file: str):
+    pass
+
+# TODO: Comment
 def main():
     input_file, output_file, is_subpixel_conversion   = retrieve_args()
 
-    print(f"In file: \"{input_file}\"")
-    print(f"Out file: \"{output_file}\"")
-    print(f"Converting to \"{'sub-pixel' if is_subpixel_conversion else 'standard-pixel'}\"")
+    # Transfrom (sub)pixels
+    if is_subpixel_conversion:
+        convert_to_subpixel(input_file, output_file)
+    else:
+        convert_to_pixel(input_file, output_file)
 
 if __name__ == "__main__":
     main()
