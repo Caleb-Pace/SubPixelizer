@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, math
 import imageio.v2 as imageio
 import numpy as np
 
@@ -94,6 +94,17 @@ def retrieve_args():
     return input_file, output_file, should_decode, is_grayscale
 
 # TODO: Comment
+def get_luminosity_value(pixel: list[int]) -> int:
+    if len(pixel) != 3:
+        raise ValueError("Pixel must be a list of exactly three integers.")
+
+    r = pixel[0]
+    g = pixel[1]
+    b = pixel[2]
+
+    return ((0.299 * r) + (0.587 * g) + (0.114 * b))
+
+# TODO: Comment
 def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
     # Read in input image
     in_img = imageio.imread(input_file)
@@ -127,12 +138,46 @@ def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
         print(f"Error: Unsupported image type! (\"{extension}\")")
         sys.exit(1)
 
-    print(f"Decoded subpixel image!\n  \"{input_file}\" -> \"{output_file}\"") 
+    print(f"Decoded subpixel image!\n  \"{input_file}\" -> \"{output_file}\"")
 
 # TODO: Comment
 # TODO: Implement
 def encode_pixels(input_file: str, output_file: str):
-    pass
+    # Read in input image
+    in_img = imageio.imread(input_file)
+
+    # Get image size
+    height, width = in_img.shape[:2]
+    out_width = math.ceil(width / 3)
+
+    # Create image
+    out_img = np.zeros((height, out_width, 3), dtype=np.uint8)
+
+    # Generate output
+    for y in range(height):
+        for x in range(out_width):
+            for c in range(3):
+                pixel = ((x * 3) + c)
+                if (pixel >= width):
+                    continue # No pixel
+                
+                # Use luminosity grayscale method
+                rgb = in_img[y, pixel] 
+                luminosity = get_luminosity_value(rgb)
+                
+                out_img[y, x][c] = luminosity # [row, column][rgb color]
+    
+    # Write output to file
+    try:
+        imageio.imwrite(output_file, out_img)
+    except ValueError:
+        # Get file extension
+        extension = output_file.split(".")[-1]
+
+        print(f"Error: Unsupported image type! (\"{extension}\")")
+        sys.exit(1)
+
+    print(f"Encoded pixel image!\n  \"{input_file}\" -> \"{output_file}\"") 
 
 # TODO: Comment
 def main():
