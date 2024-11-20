@@ -4,7 +4,7 @@ import numpy as np
 
 
 # Constants
-CMD_USAGE = "Usage: SubPixelizer.py -i <input_file> -o <output_file> [-2px]"
+CMD_USAGE = "Usage: SubPixelizer.py -i <input_file> -o <output_file> [-2px | --to-pixel] [--show-colors]"
 
 
 # TODO: Comment
@@ -25,12 +25,13 @@ def retrieve_args():
                 CMD_USAGE,
                 "",
                 "Options:",
-                "  -i,   --input           Input file (required)",
-                "  -o,   --output          Output file (required)",
-                "  -2px, --to-pixel        Convert to normal pixel format (optional, default converts to subpixel)",
-                "  -h,   --help            Display this help message"
+                "  -i,   --input              Input file (required)",
+                "  -o,   --output             Output file (required)",
+                "  -2px, --to-pixel           Convert to normal pixel format (optional, default converts to subpixel)",
+                "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale)",
+                "  -h,   --help               Display this help message"
             ]
-            print("\n".join(help_msg)) # TODO: implment
+            print("\n".join(help_msg)) # TODO: Implement
 
             sys.exit(0)
 
@@ -80,8 +81,8 @@ def retrieve_args():
             print(CMD_USAGE)
             sys.exit(1)
     else:
-        print("Error: Invalid usage! (Use the '--help' argument if you are stuck)")
         print(CMD_USAGE)
+        print("\nError: Invalid usage! (Use the '--help' argument if you are stuck)")
         sys.exit(1)
 
     return input_file, output_file, is_subpixel_conversion
@@ -105,7 +106,7 @@ def convert_to_subpixel(input_file: str, output_file: str):
                 subpixel = ((x * 3) + c)
                 intensity = in_img[y, x][c] # [row, column][rgb color]
                 
-                out_img[y, subpixel] = intensity
+                out_img[y, subpixel][c] = intensity
     
     # Write output to file
     try:
