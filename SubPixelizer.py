@@ -1,23 +1,25 @@
+# Import necessary libraries
 import os, sys, math
 import imageio.v2 as imageio
 import numpy as np
 
-
-# Constants
+# Command-line usage message
 CMD_USAGE = "Usage: SubPixelizer.py -i <input_file> -o <output_file> [-2px | --to-pixel] [--show-colors]"
 
-
-# TODO: Comment
 def is_null_or_whitespace(s: str) -> bool:
+    """
+    Check if string is null or contains only whitespace
+    """
     return (s is None or not s.strip())
 
-# TODO: Comment
-# TODO: Recomment
 def retrieve_args():
+    """
+    Retrieve command-line arguments and process them
+    """
     input_file = ""
     output_file = ""
-    should_decode = True # Should decode subpixels
-    is_grayscale = True  # Don't show subpixel color
+    should_decode = True # Default to decoding subpixels
+    is_grayscale = True  # Default to grayscale output
 
     # Print help message
     if (len(sys.argv) == 2):
@@ -33,9 +35,9 @@ def retrieve_args():
                 "  -h,   --help               Display this help message"
             ]
             print("\n".join(help_msg))
-
             sys.exit(0)
 
+    # Process command-line arguments
     if (len(sys.argv) >= 5 and len(sys.argv) <= 7):
         # Get arguments
         i = 1
@@ -93,19 +95,20 @@ def retrieve_args():
 
     return input_file, output_file, should_decode, is_grayscale
 
-# TODO: Comment
 def get_luminosity_value(pixel: list[int]) -> int:
+    """
+    Calculate the luminosity value of a pixel (using the standard formula)
+    """
     if len(pixel) != 3:
         raise ValueError("Pixel must be a list of exactly three integers.")
 
-    r = pixel[0]
-    g = pixel[1]
-    b = pixel[2]
+    r, g, b = pixel[0], pixel[1], pixel[2]
+    return ((0.2126 * r) + (0.7152 * g) + (0.0722 * b)) # Luminosity formula    
 
-    return ((0.2126 * r) + (0.7152 * g) + (0.0722 * b))
-
-# TODO: Comment
 def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
+    """
+    Decode subpixel data
+    """
     # Read in input image
     in_img = imageio.imread(input_file)
 
@@ -140,9 +143,10 @@ def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
 
     print(f"Decoded subpixel image!\n  \"{input_file}\" -> \"{output_file}\"")
 
-# TODO: Comment
-# TODO: Implement
 def encode_pixels(input_file: str, output_file: str):
+    """
+    Encode pixels by averaging their luminosity into a single pixel
+    """
     # Read in input image
     in_img = imageio.imread(input_file)
 
@@ -179,8 +183,10 @@ def encode_pixels(input_file: str, output_file: str):
 
     print(f"Encoded pixel image!\n  \"{input_file}\" -> \"{output_file}\"") 
 
-# TODO: Comment
 def main():
+    """
+    Program entry point
+    """
     input_file, output_file, should_decode, is_grayscale  = retrieve_args()
 
     # Transfrom (sub)pixels
