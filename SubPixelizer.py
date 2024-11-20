@@ -16,8 +16,8 @@ def is_null_or_whitespace(s: str) -> bool:
 def retrieve_args():
     input_file = ""
     output_file = ""
-    is_subpixel_conversion = True
-    is_grayscale = True # Don't show subpixel color
+    should_decode = True # Should decode subpixels
+    is_grayscale = True  # Don't show subpixel color
 
     # Print help message
     if (len(sys.argv) == 2):
@@ -28,7 +28,7 @@ def retrieve_args():
                 "Options:",
                 "  -i,   --input              Input file (required)",
                 "  -o,   --output             Output file (required)",
-                "  -2px, --to-pixel           Convert to normal pixel format (optional, default converts to subpixel)",
+                "  -2px, --to-pixel           Convert to normal pixel format (optional, default decodes subpixel)",
                 "        --show-colors        Show subpixel colors in output (optional, defaults to grayscale, only applies to subpixel conversion)",
                 "  -h,   --help               Display this help message"
             ]
@@ -66,7 +66,7 @@ def retrieve_args():
             # Conversion operation
             if (arg.lower() in ["--to-pixel", "-2px"]):
                 known_arg = True
-                is_subpixel_conversion = False
+                should_decode = False
 
             # Grayscale output
             if (arg.lower() == "--show-colors"):
@@ -91,10 +91,10 @@ def retrieve_args():
         print("\nError: Invalid usage! (Use the '--help' argument if you are stuck)")
         sys.exit(1)
 
-    return input_file, output_file, is_subpixel_conversion, is_grayscale
+    return input_file, output_file, should_decode, is_grayscale
 
 # TODO: Comment
-def convert_to_subpixel(input_file: str, output_file: str, is_grayscale: bool):
+def decode_subpixels(input_file: str, output_file: str, is_grayscale: bool):
     # Read in input image
     in_img = imageio.imread(input_file)
 
@@ -131,18 +131,18 @@ def convert_to_subpixel(input_file: str, output_file: str, is_grayscale: bool):
 
 # TODO: Comment
 # TODO: Implement
-def convert_to_pixel(input_file: str, output_file: str):
+def encode_pixels(input_file: str, output_file: str):
     pass
 
 # TODO: Comment
 def main():
-    input_file, output_file, is_subpixel_conversion, is_grayscale  = retrieve_args()
+    input_file, output_file, should_decode, is_grayscale  = retrieve_args()
 
     # Transfrom (sub)pixels
-    if is_subpixel_conversion:
-        convert_to_subpixel(input_file, output_file, is_grayscale)
+    if should_decode:
+        decode_subpixels(input_file, output_file, is_grayscale)
     else:
-        convert_to_pixel(input_file, output_file)
+        encode_pixels(input_file, output_file)
 
 if __name__ == "__main__":
     main()
